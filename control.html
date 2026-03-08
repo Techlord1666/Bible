@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bible Presentation — Control Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0d0d14;
+    --surface:  #14141e;
+    --card:     #1a1a27;
+    --border:   rgba(255,255,255,0.07);
+    --gold:     #c9a84c;
+    --gold-dim: #8a6f30;
+    --green:    #4ade80;
+    --red:      #f87171;
+    --blue:     #60a5fa;
+    --text:     #e8e4d8;
+    --text-dim: #6b6b80;
+    --radius:   10px;
+  }
+
+  html { font-size: 15px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    font-size: 1.6rem;
+    color: var(--gold);
+  }
+  .logo-text {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+  }
+  .logo-sub {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* ── Layout ── */
+  .main {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 0;
+    flex: 1;
+    height: calc(100vh - 65px);
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ── Content area ── */
+  .content {
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: #0a0a0f;
+    border-color: var(--gold);
+  }
+  .btn-primary:hover { background: var(--gold-dim); filter: brightness(1.2); }
+  .btn-danger  { background: rgba(248,113,113,0.12); color: var(--red); border-color: rgba(248,113,113,0.3); }
+  .btn-danger:hover  { background: rgba(248,113,113,0.2); }
+  .btn-ghost   { background: transparent; color: var(--text-dim); border-color: var(--border); }
+  .btn-ghost:hover   { background: rgba(255,255,255,0.05); color: var(--text); }
+  .btn-green   { background: rgba(74,222,128,0.12); color: var(--green); border-color: rgba(74,222,128,0.3); }
+  .btn-green:hover   { background: rgba(74,222,128,0.2); }
+  .btn-blue    { background: rgba(96,165,250,0.12); color: var(--blue); border-color: rgba(96,165,250,0.3); }
+  .btn-blue:hover    { background: rgba(96,165,250,0.2); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-full { width: 100%; justify-content: center; }
+
+  /* ── Listen status ── */
+  .listen-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .listen-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .listen-dot.active {
+    background: var(--green);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .listen-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .listen-label strong { color: var(--text); }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(74,222,128,0); }
+  }
+
+  /* ── Form controls ── */
+  .form-group { margin-bottom: 14px; }
+  .form-group:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: rgba(201,168,76,0.4);
+  }
+  select option { background: #1a1a27; }
+
+  textarea {
+    min-height: 80px;
+    resize: vertical;
+    font-style: italic;
+  }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 80px 80px;
+    gap: 8px;
+  }
+
+  /* ── Current verse preview ── */
+  #current-preview {
+    background: rgba(201,168,76,0.04);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: var(--radius);
+    padding: 18px;
+    min-height: 110px;
+  }
+  .preview-ref {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .preview-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text);
+    font-style: italic;
+  }
+  .preview-empty {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: 10px 0;
+  }
+  .preview-trans {
+    margin-top: 8px;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
+
+  /* ── Speech log ── */
+  #speech-log {
+    font-family: 'Inter', monospace;
+    font-size: 0.78rem;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 12px;
+    height: 160px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .log-entry {
+    padding: 3px 6px;
+    border-radius: 4px;
+  }
+  .log-entry.speech { color: var(--blue); }
+  .log-entry.verse  { color: var(--green); }
+  .log-entry.error  { color: var(--red); }
+  .log-entry.info   { color: var(--text-dim); }
+  .log-time { opacity: 0.5; margin-right: 6px; }
+
+  /* ── History table ── */
+  .history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+  .history-table th {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .history-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    vertical-align: top;
+  }
+  .history-table tr:last-child td { border-bottom: none; }
+  .history-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .history-ref { color: var(--gold); font-weight: 500; }
+  .history-ver { color: var(--text-dim); font-size: 0.72rem; }
+
+  /* ── Badge ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .badge-gold { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .badge-blue { background: rgba(96,165,250,0.15); color: var(--blue); }
+
+  /* ── Quick refs ── */
+  .quick-refs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .quick-ref-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .quick-ref-btn:hover {
+    background: rgba(201,168,76,0.08);
+    border-color: rgba(201,168,76,0.3);
+    color: var(--gold);
+  }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 0.82rem;
+    z-index: 999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.23,1,0.32,1);
+    max-width: 320px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { border-color: rgba(74,222,128,0.3); }
+  #toast.error   { border-color: rgba(248,113,113,0.3); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">✝</div>
+    <div>
+      <div class="logo-text">Bible Presentation</div>
+      <div class="logo-sub">Control Panel</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <a href="/display" target="_blank" class="btn btn-ghost" style="text-decoration:none">
+      📺 Open Display
+    </a>
+    <button class="btn btn-danger" onclick="clearDisplay()">✕ Clear Screen</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+
+    <!-- Listen control -->
+    <div class="card">
+      <div class="card-title">Voice Recognition</div>
+      <div class="listen-status">
+        <div class="listen-dot" id="listen-dot"></div>
+        <div class="listen-label" id="listen-label"><strong>Standby</strong></div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-green btn-full" id="btn-start" onclick="startListening()">
+          🎤 Start Listening
+        </button>
+        <button class="btn btn-danger" id="btn-stop" onclick="stopListening()" disabled>
+          ⏹ Stop
+        </button>
+      </div>
+    </div>
+
+    <!-- Manual text input -->
+    <div class="card">
+      <div class="card-title">Test Speech Input</div>
+      <div class="form-group">
+        <label>Type a spoken phrase</label>
+        <textarea id="speech-input" placeholder='e.g. "John 3:16 in NIV" or "Romans 8:28"'></textarea>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="submitSpeech()">
+        ▶ Process & Display
+      </button>
+    </div>
+
+    <!-- Manual verse lookup -->
+    <div class="card">
+      <div class="card-title">Direct Verse Lookup</div>
+      <div class="form-group">
+        <label>Book</label>
+        <input id="m-book" type="text" placeholder="e.g. John" />
+      </div>
+      <div class="input-row" style="margin-bottom:14px;">
+        <div>
+          <label>Chapter</label>
+          <input id="m-chapter" type="number" min="1" placeholder="3" />
+        </div>
+        <div>
+          <label>Verse</label>
+          <input id="m-verse" type="number" min="1" placeholder="16" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Translation</label>
+        <select id="m-translation">
+          <option value="kjv">KJV — King James Version</option>
+          <option value="niv">NIV — New International</option>
+          <option value="msg">MSG — The Message</option>
+          <option value="nlt">NLT — New Living Translation</option>
+          <option value="esv">ESV — English Standard</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="manualLookup()">
+        🔍 Display Verse
+      </button>
+    </div>
+
+    <!-- Quick references -->
+    <div class="card">
+      <div class="card-title">Quick References</div>
+      <div class="quick-refs">
+        <button class="quick-ref-btn" onclick="quickRef('John 3:16')">John 3:16</button>
+        <button class="quick-ref-btn" onclick="quickRef('Romans 8:28')">Romans 8:28</button>
+        <button class="quick-ref-btn" onclick="quickRef('Psalm 23:1')">Psalm 23:1</button>
+        <button class="quick-ref-btn" onclick="quickRef('Jeremiah 29:11')">Jer 29:11</button>
+        <button class="quick-ref-btn" onclick="quickRef('Philippians 4:13')">Phil 4:13</button>
+        <button class="quick-ref-btn" onclick="quickRef('Isaiah 40:31')">Isa 40:31</button>
+        <button class="quick-ref-btn" onclick="quickRef('Matthew 11:28')">Matt 11:28</button>
+        <button class="quick-ref-btn" onclick="quickRef('Hebrews 11:1')">Heb 11:1</button>
+        <button class="quick-ref-btn" onclick="quickRef('Proverbs 3:5')">Prov 3:5</button>
+        <button class="quick-ref-btn" onclick="quickRef('Ephesians 2:8')">Eph 2:8</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── Main content ── -->
+  <main class="content">
+
+    <!-- Current verse preview -->
+    <div class="card">
+      <div class="card-title">Currently Displayed</div>
+      <div id="current-preview">
+        <div class="preview-empty">No verse on screen</div>
+      </div>
+    </div>
+
+    <!-- Speech log -->
+    <div class="card">
+      <div class="card-title">Activity Log</div>
+      <div id="speech-log">
+        <div class="log-entry info"><span class="log-time">--:--</span>System ready</div>
+      </div>
+    </div>
+
+    <!-- Display history -->
+    <div class="card">
+      <div class="card-title">Recent Display History</div>
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Version</th>
+            <th>Speech Input</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="history-body">
+          <tr><td colspan="4" style="color:var(--text-dim);font-style:italic;">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let isListening = false;
+
+// ── SSE ───────────────────────────────────────────────────────────────────────
+const evtSource = new EventSource('/api/stream');
+evtSource.onmessage = (e) => {
+  const msg = JSON.parse(e.data);
+  if (msg.type === 'ping') return;
+  if (msg.type === 'init' || msg.type === 'verse') updatePreview(msg.data);
+  if (msg.type === 'clear') clearPreview();
+  if (msg.type === 'status') setListenUI(msg.data.listening);
+  if (msg.type === 'speech') addLog('speech', `🎙 "${msg.data.text}"`);
+  if (msg.type === 'verse')  addLog('verse', `✅ ${msg.data.reference} [${msg.data.translation}]`);
+  if (msg.type === 'error')  addLog('error', `⚠ ${msg.data.message}`);
+};
+
+// ── Listen control ────────────────────────────────────────────────────────────
+async function startListening() {
+  const r = await fetch('/api/listen/start', { method: 'POST' });
+  const d = await r.json();
+  if (d.status === 'started' || d.status === 'already_listening') {
+    setListenUI(true);
+    addLog('info', '🎤 Voice recognition started');
+  }
+}
+
+async function stopListening() {
+  await fetch('/api/listen/stop', { method: 'POST' });
+  setListenUI(false);
+  addLog('info', '⏹ Voice recognition stopped');
+}
+
+function setListenUI(listening) {
+  isListening = listening;
+  document.getElementById('listen-dot').className = 'listen-dot' + (listening ? ' active' : '');
+  document.getElementById('listen-label').innerHTML = listening
+    ? '<strong style="color:var(--green)">Listening…</strong>'
+    : '<strong>Standby</strong>';
+  document.getElementById('btn-start').disabled = listening;
+  document.getElementById('btn-stop').disabled = !listening;
+}
+
+// ── Speech test ───────────────────────────────────────────────────────────────
+async function submitSpeech() {
+  const text = document.getElementById('speech-input').value.trim();
+  if (!text) return;
+  addLog('speech', `🗣 "${text}"`);
+  const r = await fetch('/api/verse', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+  });
+  const d = await r.json();
+  if (!r.ok) {
+    toast(d.error || 'Verse not found', 'error');
+    addLog('error', `⚠ ${d.error}`);
+  } else {
+    toast(`Displayed: ${d.verse.reference}`, 'success');
+    loadHistory();
+  }
+}
+
+// ── Manual lookup ─────────────────────────────────────────────────────────────
+async function manualLookup() {
+  const body = {
+    book: document.getElementById('m-book').value.trim(),
+    chapter: document.getElementById('m-chapter').value,
+    verse: document.getElementById('m-verse').value,
+    translation: document.getElementById('m-translation').value,
+  };
+  if (!body.book || !body.chapter || !body.verse) {
+    toast('Please fill in all fields', 'error'); return;
+  }
+  const r = await fetch('/api/verse/manual', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const d = await r.json();
+  if (!r.ok) {
+    toast(d.error || 'Verse not found', 'error');
+  } else {
+    toast(`Displayed: ${d.verse.reference}`, 'success');
+    loadHistory();
+  }
+}
+
+// ── Quick ref ─────────────────────────────────────────────────────────────────
+function quickRef(ref) {
+  document.getElementById('speech-input').value = ref;
+  submitSpeech();
+}
+
+// ── Clear ─────────────────────────────────────────────────────────────────────
+async function clearDisplay() {
+  await fetch('/api/clear', { method: 'POST' });
+  clearPreview();
+  addLog('info', '🧹 Screen cleared');
+  toast('Screen cleared', 'success');
+}
+
+// ── Preview ───────────────────────────────────────────────────────────────────
+function updatePreview(data) {
+  if (!data || !data.text) { clearPreview(); return; }
+  document.getElementById('current-preview').innerHTML = `
+    <div class="preview-ref">${data.reference || ''}</div>
+    <div class="preview-text">${data.text || ''}</div>
+    <div class="preview-trans">${data.translation || 'KJV'}</div>
+  `;
+}
+function clearPreview() {
+  document.getElementById('current-preview').innerHTML = '<div class="preview-empty">No verse on screen</div>';
+}
+
+// ── History ───────────────────────────────────────────────────────────────────
+async function loadHistory() {
+  const r = await fetch('/api/history');
+  const data = await r.json();
+  const tbody = document.getElementById('history-body');
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-dim);font-style:italic;">No history yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(h => `
+    <tr>
+      <td><span class="history-ref">${h.book} ${h.chapter}:${h.verse}</span></td>
+      <td><span class="badge badge-gold">${h.version}</span></td>
+      <td style="color:var(--text-dim);font-style:italic;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.speech || '—'}</td>
+      <td style="color:var(--text-dim);font-size:0.75rem;">${new Date(h.time).toLocaleTimeString()}</td>
+    </tr>
+  `).join('');
+}
+
+// ── Log ───────────────────────────────────────────────────────────────────────
+function addLog(type, msg) {
+  const log = document.getElementById('speech-log');
+  const now = new Date().toLocaleTimeString('en', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  entry.innerHTML = `<span class="log-time">${now}</span>${msg}`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+  if (log.children.length > 100) log.removeChild(log.firstChild);
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3000);
+}
+
+// ── Keyboard shortcut: Enter on textarea ──────────────────────────────────────
+document.getElementById('speech-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    submitSpeech();
+  }
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadHistory();
+setInterval(loadHistory, 30000);
+
+fetch('/api/status').then(r => r.json()).then(d => {
+  if (d.current_verse?.text) updatePreview(d.current_verse);
+  setListenUI(d.listening);
+  addLog('info', d.db_exists ? '✅ Database connected' : '⚠ Database not found — run seed.py');
+});
+</script>
+</body>
+</html>
